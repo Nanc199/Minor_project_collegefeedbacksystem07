@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Previous Average Rating{% endblock %}
+
+{% block extra_css %}
+<style>
+    .average-panel {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 24px;
+        background: #f8fafc;
+    }
+
+    .average-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px;
+        height: 100%;
+    }
+
+    .average-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0d6efd;
+        line-height: 1;
+    }
+
+    .average-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin-top: 6px;
+    }
+
+    .data-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .data-header {
+        padding: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(135deg, #ff512f, #dd2476);
+    }
+
+    .data-body {
+        padding: 20px;
+        background: white;
+    }
+
+    .data-count {
+        background: rgba(255,255,255,0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+    }
+
+    .summary-title {
+        font-weight: 700;
+        margin: 18px 0 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="fas fa-history"></i> Previous Average Rating</h2>
+    <a href="{{ url_for('superadmin_dashboard', tab='average', branch=selected_branch, semester=selected_semester, subject_code=selected_subject_code, subject=selected_subject, teacher=selected_teacher) }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<div class="data-card">
+    <div class="data-header">
+        <div>
+            <i class="fas fa-history me-3"></i>
+            <h4>Previous Feedback Average Rating</h4>
+        </div>
+        <span class="data-count">{{ previous_average_summary.teacher_rows|length }} Teachers</span>
+    </div>
+
+    <div class="data-body">
+        <div class="average-panel">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <div>
+                    <h5 class="mb-1"><i class="fas fa-history me-2"></i>Previous Feedback Average Rating</h5>
+                    <div class="text-muted">The average rating here will be different for feedback entries that are not shown in the current View Feedback rows.
+.</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('export_superadmin_previous_average', branch=selected_branch, semester=selected_semester, subject_code=selected_subject_code, subject=selected_subject, teacher=selected_teacher) }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-file-excel"></i> Export Average Excel
+                    </a>
+                    <form method="POST"
+                          action="{{ url_for('delete_superadmin_previous_feedbacks', branch=selected_branch, semester=selected_semester, subject_code=selected_subject_code, subject=selected_subject, teacher=selected_teacher) }}"
+                          onsubmit="return confirm('you want to delete previous average rating data?')">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="average-card">
+                        <div class="average-value">{{ "%.2f"|format(previous_average_summary.overall_average) }}/5</div>
+                        <div class="average-label">Previous overall average: {{ previous_average_summary.overall_label }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="average-card">
+                        <div class="average-value">{{ previous_feedbacks|length }}</div>
+                        <div class="average-label">Previous feedbacks included</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="average-card">
+                        <div class="average-value">{{ previous_average_summary.teacher_rows|length }}</div>
+                        <div class="average-label">Previous teachers included</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="average-card">
+                        <div class="average-value">{{ total_students_uploaded }}</div>
+                        <div class="average-label">Total students</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if previous_average_summary.teacher_rows %}
+            <div class="summary-title"> Teacher Semester Wise Combined Average</div>
+            <div class="table-responsive mb-3">
+                <table class="table table-sm table-bordered align-middle bg-white">
+                    <thead>
+                        <tr>
+                            <th>Branch</th>
+                            <th>Semester</th>
+                            <th>Teacher</th>
+                            <th>Subjects</th>
+                            <th>Feedbacks</th>
+                            <th>Average</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in previous_average_summary.teacher_semester_rows %}
+                        <tr>
+                            <td>{{ row.branch }}</td>
+                            <td>{{ row.semester }}</td>
+                            <td>{{ row.teacher }}</td>
+                            <td>{{ row.subjects }}</td>
+                            <td>{{ row.feedback_count }}</td>
+                            <td><strong>{{ "%.2f"|format(row.average_rating) }}/5</strong></td>
+                            <td>{{ row.rating_label }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="summary-title"> Subject Wise Average</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle bg-white">
+                    <thead>
+                        <tr>
+                            <th>Branch</th>
+                            <th>Semester</th>
+                            <th>Teacher</th>
+                            <th>Subject Code</th>
+                            <th>Subject</th>
+                            <th>Feedbacks</th>
+                            <th>Average</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in previous_average_summary.subject_rows %}
+                        <tr>
+                            <td>{{ row.branch }}</td>
+                            <td>{{ row.semester }}</td>
+                            <td>{{ row.teacher }}</td>
+                            <td>{{ row.subject_code }}</td>
+                            <td>{{ row.subject }}</td>
+                            <td>{{ row.feedback_count }}</td>
+                            <td><strong>{{ "%.2f"|format(row.average_rating) }}/5</strong></td>
+                            <td>{{ row.rating_label }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-history fa-3x mb-3"></i>
+                <h5>No Previous Feedback Average Found</h5>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

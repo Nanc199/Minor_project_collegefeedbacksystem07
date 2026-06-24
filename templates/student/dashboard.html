@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Profile Card -->
+<div class="card mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <div class="card-body">
+        <div class="row align-items-center">
+
+            <div class="col-md-2 text-center">
+                <i class="fas fa-user-graduate fa-5x"></i>
+            </div>
+
+            <div class="col-md-10">
+                <h2>Welcome, {{ student.name }}</h2>
+
+                <div class="row mt-3">
+
+                    <div class="col-md-3">
+                        <p><strong>Roll No:</strong> {{ student.roll_number or "N/A" }}</p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <p><strong>Branch:</strong> {{ student.branch or "N/A" }}</p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <p><strong>Semester:</strong> {{ student.semester or "N/A" }}</p>
+                    </div>
+
+                    <div class="col-md-3">
+                        <p><strong>Year:</strong> {{ student.academic_year or "N/A" }}</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Section -->
+<!-- Feedback Section -->
+<h3><i class="fas fa-chalkboard-teacher"></i> Faculty Feedback</h3>
+<p class="text-muted">Give feedback for each teacher. Each can be submitted once.</p>
+
+{% if feedback_settings and feedback_settings.feedback_start and feedback_settings.feedback_end %}
+<div class="alert {% if feedback_open %}alert-success{% else %}alert-danger{% endif %}">
+    Feedback time:
+    <strong>{{ feedback_settings.feedback_start.strftime('%d-%m-%Y %I:%M %p') }}</strong>
+    to
+    <strong>{{ feedback_settings.feedback_end.strftime('%d-%m-%Y %I:%M %p') }}</strong>
+
+    {% if not feedback_open %}
+        <br>Feedback is currently closed.
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="row">
+
+
+
+
+
+    {% for ts in teacher_subjects %}
+    {% if ts.teacher %}
+    <div class="col-md-4 mb-4">
+        <div class="card teacher-card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">{{ ts.teacher.name }}</h5>
+            </div>
+
+            <div class="card-body">
+                <p>
+    <strong>Subject:</strong>
+    {{ ts.subject or "N/A" }}
+    {% if ts.subject_code %}
+        ({{ ts.subject_code }})
+    {% endif %}
+</p>
+
+               {% if not feedback_open %}
+    <button class="btn btn-secondary w-100" disabled>
+        Feedback Closed
+    </button>
+{% elif (ts.teacher_id, ts.subject) in submitted_keys %}
+    <button class="btn btn-secondary w-100" disabled>
+        <i class="fas fa-check"></i> Submitted
+    </button>
+{% else %}
+    <a href="{{ url_for('feedback_form', teacher_id=ts.teacher_id, subject=ts.subject) }}"
+       class="btn btn-primary w-100">
+        <i class="fas fa-pen"></i> Give Feedback
+    </a>
+{% endif %}
+
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No teachers assigned for your branch and semester.
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}
+

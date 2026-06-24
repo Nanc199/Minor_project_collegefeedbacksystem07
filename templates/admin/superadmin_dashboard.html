@@ -1,0 +1,1158 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-card {
+        border-radius: 20px;
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+    }
+
+    .upload-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .student-upload {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .teacher-upload {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .upload-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .upload-icon i {
+        font-size: 3rem;
+    }
+
+    .data-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .data-header {
+        padding: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .student-data .data-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .teacher-data .data-header {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .feedback-data .data-header {
+        background: linear-gradient(135deg, #ff512f, #dd2476);
+    }
+
+    .data-body {
+        padding: 20px;
+        background: white;
+    }
+
+    .data-count {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+    }
+
+    .file-drop-area {
+        border: 2px dashed #ccc;
+        border-radius: 15px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .file-drop-area:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+    }
+
+    .file-drop-area i {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 15px;
+    }
+
+    .info-box {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .table-container {
+        max-height: 430px;
+        overflow-y: auto;
+    }
+
+    .empty-data {
+        text-align: center;
+        padding: 45px;
+        color: #999;
+    }
+
+    .empty-data i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .saved-window {
+        background: #cff4fc;
+        color: #055160;
+        padding: 16px 20px;
+        border-radius: 8px;
+        margin-top: 18px;
+    }
+
+    .average-panel {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 24px;
+        background: #f8fafc;
+    }
+
+    .average-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px;
+        height: 100%;
+    }
+
+    .average-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0d6efd;
+        line-height: 1;
+    }
+
+    .average-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin-top: 6px;
+    }
+
+    .summary-title {
+        font-weight: 700;
+        margin: 18px 0 10px;
+    }
+
+    .table-responsive table {
+    border: 2px solid #000;
+}
+
+.table-responsive table thead th {
+    border-bottom: 2px solid #000 !important;
+    background: #fff;
+}
+
+.semester-divider td {
+    border-top: 2px solid #000 !important;
+    padding: 0 !important;
+    height: 0;
+    background: transparent !important;
+}
+
+    .pending-filter-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 24px;
+    }
+
+    .pending-data .data-header {
+        background: linear-gradient(135deg, #0f172a 0%, #0f766e 100%);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .header-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .header-title {
+        font-size: 1.55rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .header-subtitle {
+        opacity: 0.8;
+        font-size: 0.95rem;
+    }
+
+    .table-wrapper {
+        overflow: hidden;
+        border-radius: 14px;
+        border: 1px solid #dbe4ee;
+        background: white;
+    }
+
+    .student-name {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .semester-badge {
+        background: #dbeafe;
+        color: #1d4ed8;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .branch-badge {
+        background: #ecfeff;
+        color: #0f766e;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .subject-box {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 12px;
+        padding: 10px 12px;
+        color: #9a3412;
+        line-height: 1.7;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        padding: 55px 20px;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        width: 90px;
+        height: 90px;
+        margin: auto auto 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #16a34a;
+    }
+    
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2>
+        <i class="fas fa-user-cog"></i>
+        College Admin Dashboard
+    </h2>
+
+    <div class="d-flex gap-2">
+
+        <button class="btn btn-dark"
+                data-bs-toggle="modal"
+                data-bs-target="#profileModal">
+
+            <i class="fas fa-user"></i>
+            Manage Profile
+        </button>
+
+        
+
+    </div>
+
+</div>
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h5 class="mb-3">
+            <i class="fas fa-clock me-2"></i> Set Feedback Time Window
+        </h5>
+
+        <form method="POST" action="{{ url_for('set_feedback_window') }}">
+            <div class="row align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Start Time</label>
+                    <input type="datetime-local" name="start_time" class="form-control"
+                        value="{{ feedback_settings.feedback_start.strftime('%Y-%m-%dT%H:%M') if feedback_settings and feedback_settings.feedback_start else '' }}"
+                        required>
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label">End Time</label>
+                    <input type="datetime-local" name="end_time" class="form-control"
+                        value="{{ feedback_settings.feedback_end.strftime('%Y-%m-%dT%H:%M') if feedback_settings and feedback_settings.feedback_end else '' }}"
+                        required>
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Save</button>
+                </div>
+            </div>
+        </form>
+
+        {% if feedback_settings and feedback_settings.feedback_start and feedback_settings.feedback_end %}
+        <div class="saved-window">
+            Feedback allowed from
+            <strong>{{ feedback_settings.feedback_start.strftime('%d-%m-%Y %I:%M %p') }}</strong>
+            to
+            <strong>{{ feedback_settings.feedback_end.strftime('%d-%m-%Y %I:%M %p') }}</strong>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <button
+            class="nav-link {% if request.args.get('tab') not in ['view', 'feedback', 'average', 'pending'] %}active{% endif %}"
+            data-bs-toggle="tab" data-bs-target="#upload">
+            <i class="fas fa-file-upload me-2"></i>Upload Data
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="nav-link {% if request.args.get('tab') == 'view' %}active{% endif %}" data-bs-toggle="tab"
+            data-bs-target="#view">
+            <i class="fas fa-eye me-2"></i>View Data
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="nav-link {% if request.args.get('tab') == 'feedback' %}active{% endif %}" data-bs-toggle="tab"
+            data-bs-target="#feedback">
+            <i class="fas fa-comments me-2"></i>View Feedback
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="nav-link {% if request.args.get('tab') == 'average' %}active{% endif %}" data-bs-toggle="tab"
+            data-bs-target="#average">
+            <i class="fas fa-star-half-alt me-2"></i>Average Rating
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button class="nav-link {% if request.args.get('tab') == 'pending' %}active{% endif %}" data-bs-toggle="tab"
+            data-bs-target="#pending">
+            <i class="fas fa-user-clock me-2"></i>Pending Feedback
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade {% if request.args.get('tab') not in ['view', 'feedback', 'average', 'pending'] %}show active{% endif %}"
+        id="upload">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="upload-card student-upload" data-bs-toggle="modal" data-bs-target="#studentUploadModal">
+                    <div class="upload-icon"><i class="fas fa-user-graduate"></i></div>
+                    <h4>Upload Students</h4>
+                    <p>Import student data</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="upload-card teacher-upload" data-bs-toggle="modal" data-bs-target="#teacherUploadModal">
+                    <div class="upload-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h4>Upload Teachers</h4>
+                    <p>Import teacher data</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade {% if request.args.get('tab') == 'view' %}show active{% endif %}" id="view">
+        <div class="data-card student-data">
+            <div class="data-header">
+                <div>
+                    <i class="fas fa-user-graduate me-3"></i>
+                    <h4>Student Files</h4>
+                </div>
+                <span class="data-count">{{ students_files|length }} Files</span>
+            </div>
+
+            <div class="data-body">
+                {% if students_files %}
+                <div class="table-container">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Uploaded At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in students_files %}
+                            <tr>
+                                <td>
+                                    {{ file.filename }}
+                                    {% if not file.physical_exists %}
+                                    <span class="badge bg-warning text-dark ms-2">Missing file</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ file.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if file.physical_exists %}
+                                    <a href="{{ url_for('view_file', file_id=file.id) }}"
+                                        class="btn btn-sm btn-primary">Open/Edit/Promote</a>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-secondary" disabled>Open/Edit/Promote</button>
+                                    {% endif %}
+
+                                    <a href="{{ url_for('delete_file', file_id=file.id) }}"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('File, related users, subjects, and matching-semester feedbacks will be permanently deleted. Old/previous semester feedback will stay saved. Continue?')">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-data">
+                    <i class="fas fa-user-graduate"></i>
+                    <h5>No Student Files Found</h5>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="data-card teacher-data">
+            <div class="data-header">
+                <div>
+                    <i class="fas fa-chalkboard-teacher me-3"></i>
+                    <h4>Teacher Files</h4>
+                </div>
+                <span class="data-count">{{ teachers_files|length }} Files</span>
+            </div>
+
+            <div class="data-body">
+                {% if teachers_files %}
+                <div class="table-container">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Uploaded At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in teachers_files %}
+                            <tr>
+                                <td>
+                                    {{ file.filename }}
+                                    {% if not file.physical_exists %}
+                                    <span class="badge bg-warning text-dark ms-2">Missing file</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ file.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if file.physical_exists %}
+                                    <a href="{{ url_for('view_file', file_id=file.id) }}"
+                                        class="btn btn-sm btn-primary">Open/Edit</a>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-secondary" disabled>Open/Edit</button>
+                                    {% endif %}
+
+                                    <a href="{{ url_for('delete_file', file_id=file.id) }}"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Teacher file, related teachers, subjects, and all feedback for those teachers will be permanently deleted. Reuploading this Excel will not bring old feedback back. Continue?')">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-data">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h5>No Teacher Files Found</h5>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade {% if request.args.get('tab') == 'feedback' %}show active{% endif %}" id="feedback">
+        <div class="data-card feedback-data">
+            <div class="data-header">
+                <div>
+                    <i class="fas fa-comments me-3"></i>
+                    <h4>Student Feedbacks</h4>
+                </div>
+                <span class="data-count">{{ feedbacks|length }} Feedbacks</span>
+            </div>
+
+            <div class="data-body">
+                <form method="GET" action="{{ url_for('superadmin_dashboard') }}" class="mb-4">
+                    <input type="hidden" name="tab" value="feedback" id="feedback_tab_input">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Branch</label>
+                            <select name="branch" class="form-control">
+                                <option value="">All Branches</option>
+                                {% for branch in branch_options %}
+                                <option value="{{ branch }}" {% if selected_branch==branch %}selected{% endif %}>{{
+                                    branch }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Semester</label>
+                            <select name="semester" class="form-control">
+                                <option value="">All Semesters</option>
+                                {% for sem in range(1, 9) %}
+                                <option value="{{ sem }}" {% if selected_semester|string==sem|string %}selected{% endif
+                                    %}>Semester {{ sem }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Subject Code</label>
+                            <select name="subject_code" class="form-control">
+                                <option value="">All Subject Codes</option>
+
+
+
+                                {% for code in subject_code_options %}
+                                <option value="{{ code }}" {% if selected_subject_code==code %}selected{% endif %}>{{
+                                    code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Subject</label>
+                            <select name="subject" class="form-control">
+                                <option value="">All Subjects</option>
+                                {% for subject in subject_options %}
+                                <option value="{{ subject }}" {% if selected_subject==subject %}selected{% endif %}>
+                                    {{ subject }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div class="col-md-3">
+                            <label class="form-label">Teacher</label>
+                            <select name="teacher" class="form-control">
+                                <option value="">All Teachers</option>
+                                {% for teacher in teacher_options %}
+                                <option value="{{ teacher.id }}" {% if selected_teacher|string==teacher.id|string
+                                    %}selected{% endif %}>{{ teacher.username }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+
+                        <button type="submit" formaction="{{ url_for('export_superadmin_feedback') }}"
+                            class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </button>
+
+                        <a href="{{ url_for('superadmin_dashboard', tab='feedback') }}"
+                            class="btn btn-secondary">Reset</a>
+                    </div>
+                </form>
+
+                {% if feedbacks %}
+                <div class="table-container" id="feedback-table">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Roll No</th>
+                                <th>Branch</th>
+                                <th>Semester</th>
+                                <th>Teacher</th>
+                                <th>Subject Code</th>
+                                <th>Subject</th>
+
+                                <th>Total</th>
+                                <th>Average</th>
+                                <th>Date</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fb in feedbacks %}
+                            <tr>
+                                <td>{{ fb.student.name }}</td>
+                                <td>{{ fb.student.roll_number or '-' }}</td>
+                                <td>{{ fb.student.branch or '-' }}</td>
+                                <td>{{ fb.semester }}</td>
+                                <td>{{ fb.teacher.name or fb.teacher.username }}</td>
+                                <td>{{ fb.subject_code or '-' }}</td>
+                                <td>{{ fb.subject or '-' }}</td>
+
+                                <td>{{ fb.total }}/60</td>
+                                <td>{{ "%.2f"|format(fb.total / 12) }}</td>
+                                <td>{{ fb.created_at.strftime('%d-%m-%Y %I:%M %p') }}</td>
+
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-data">
+                    <i class="fas fa-comments"></i>
+                    <h5>No Feedback Found</h5>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade {% if request.args.get('tab') == 'average' %}show active{% endif %}" id="average">
+        <div class="data-card feedback-data">
+            <div class="data-header">
+                <div>
+                    <i class="fas fa-star-half-alt me-3"></i>
+                    <h4>Average Rating</h4>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="data-count">{{ average_summary.teacher_rows|length }} Teachers</span>
+                </div>
+            </div>
+
+            <div class="data-body">
+                <div class="average-panel">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+       <h5 class="mb-1">
+           <i class="fas fa-star-half-alt me-2"></i>
+           Current Feedback Average Rating
+       </h5>
+
+       <div class="text-muted">
+           The average rating will be calculated only from the rows currently visible in View Feedback.
+       </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('export_superadmin_average', branch=selected_branch, semester=selected_semester, subject_code=selected_subject_code, subject=selected_subject, teacher=selected_teacher) }}"
+            class="btn btn-success btn-sm">
+            <i class="fas fa-file-excel"></i> Export Average Excel
+        </a>
+
+        <a href="{{ url_for('superadmin_previous_average', branch=selected_branch, semester=selected_semester, subject_code=selected_subject_code, subject=selected_subject, teacher=selected_teacher) }}"
+            class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-history"></i> Previous Average Rating
+        </a>
+
+    </div>
+</div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="average-card">
+                                <div class="average-value">{{ "%.2f"|format(average_summary.overall_average) }}/5</div>
+                                <div class="average-label">Overall average rating: {{ average_summary.overall_label }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="average-card">
+                                <div class="average-value">{{ feedbacks|length }}</div>
+                                <div class="average-label">Feedbacks included</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="average-card">
+                                <div class="average-value">{{ average_summary.teacher_rows|length }}</div>
+                                <div class="average-label">Teachers included</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <a class="average-card d-block text-decoration-none" href="{{ url_for('superadmin_dashboard', tab='pending', branch=selected_branch, semester=selected_semester, subject_code=selected_subject_code, subject=selected_subject, teacher=selected_teacher) }}">
+                                <div class="average-value">{{ pending_feedback_summary.total_pending_students }}</div>
+                                <div class="average-label">Students pending feedback</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if average_summary.teacher_rows %}
+                    <div class="summary-title">Semester Wise Teacher Ratings</div>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm align-middle bg-white">
+                            <thead>
+                                <tr>
+                                    <th>Branch</th>
+                                    <th>Semester</th>
+                                    <th>Teacher</th>
+                                    <th>Subjects</th>
+                                    <th>Feedbacks</th>
+                                    <th>Average</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set ns = namespace(last_sem='') %}
+
+                                {% for row in average_summary.teacher_semester_rows %}
+
+                                {% if ns.last_sem != row.semester %}
+                                <tr class="semester-divider">
+                                    <td colspan="7"></td>
+                                </tr>
+                                {% set ns.last_sem = row.semester %}
+                                {% endif %}
+
+                                <tr>
+                                    <td>{{ row.branch }}</td>
+                                    <td>{{ row.semester }}</td>
+                                    <td>{{ row.teacher }}</td>
+                                    <td>{{ row.subjects }}</td>
+                                    <td>{{ row.feedback_count }}</td>
+                                    <td><strong>{{ "%.2f"|format(row.average_rating) }}/5</strong></td>
+                                    <td>{{ row.rating_label }}</td>
+                                </tr>
+
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="summary-title">Overall Teacher Ratings</div>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm align-middle bg-white">
+                            <thead>
+                                <tr>
+                                    <th>Teacher</th>
+                                    <th>Branches</th>
+                                    <th>Semesters</th>
+                                    <th>Subjects</th>
+                                    <th>Feedbacks</th>
+                                    <th>Average</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in average_summary.teacher_rows %}
+                                <tr>
+                                    <td>{{ row.teacher }}</td>
+                                    <td>{{ row.branches }}</td>
+                                    <td>{{ row.semesters }}</td>
+                                    <td>{{ row.subjects }}</td>
+                                    <td>{{ row.feedback_count }}</td>
+                                    <td><strong>{{ "%.2f"|format(row.average_rating) }}/5</strong></td>
+                                    <td>{{ row.rating_label }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="summary-title">Subject Wise Ratings</div>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle bg-white">
+                            <thead>
+                                <tr>
+                                    <th>Branch</th>
+                                    <th>Semester</th>
+                                    <th>Teacher</th>
+                                    <th>Subject Code</th>
+                                    <th>Subject</th>
+                                    <th>Feedbacks</th>
+                                    <th>Average</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set ns = namespace(last_sem='') %}
+
+                                {% for row in average_summary.subject_rows %}
+
+                                {% if ns.last_sem != row.semester %}
+                                <tr class="semester-divider">
+                                    <td colspan="8"></td>
+                                </tr>
+                                {% set ns.last_sem = row.semester %}
+                                {% endif %}
+
+                                <tr>
+                                    <td>{{ row.branch }}</td>
+                                    <td>{{ row.semester }}</td>
+                                    <td>{{ row.teacher }}</td>
+                                    <td>{{ row.subject_code }}</td>
+                                    <td>{{ row.subject }}</td>
+                                    <td>{{ row.feedback_count }}</td>
+                                    <td><strong>{{ "%.2f"|format(row.average_rating) }}/5</strong></td>
+                                    <td>{{ row.rating_label }}</td>
+                                </tr>
+
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-data">
+                        <i class="fas fa-star-half-alt"></i>
+                        <h5>No Average Rating Found</h5>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade {% if request.args.get('tab') == 'pending' %}show active{% endif %}" id="pending">
+        <div class="pending-filter-card">
+            <form method="GET" action="{{ url_for('superadmin_dashboard') }}">
+                <input type="hidden" name="tab" value="pending">
+                <input type="hidden" name="subject_code" value="{{ selected_subject_code }}">
+                <input type="hidden" name="subject" value="{{ selected_subject }}">
+                <input type="hidden" name="teacher" value="{{ selected_teacher }}">
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label">Branch</label>
+                        <select name="branch" class="form-select">
+                            <option value="">All Branches</option>
+                            {% for branch in branch_options %}
+                            <option value="{{ branch }}" {% if selected_branch == branch %}selected{% endif %}>
+                                {{ branch }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Semester</label>
+                        <select name="semester" class="form-select">
+                            <option value="">All Semesters</option>
+                            {% for semester in range(1, 9) %}
+                            <option value="{{ semester }}" {% if selected_semester == semester|string %}selected{% endif %}>
+                                Semester {{ semester }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="fas fa-filter me-2"></i>Apply
+                        </button>
+                        <a href="{{ url_for('superadmin_dashboard', tab='pending') }}"
+                           class="btn btn-outline-secondary">
+                            Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="data-card pending-data">
+            <div class="data-header">
+                <div class="header-left">
+                    <div class="header-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div>
+                        <div class="header-title">Students Pending Feedback</div>
+                        <div class="header-subtitle">Students who have not submitted all required subject feedbacks</div>
+                    </div>
+                </div>
+
+                <div class="data-count">
+                    {{ pending_feedback_summary.total_pending_students }} Students
+                </div>
+            </div>
+
+            <div class="data-body">
+                {% if pending_feedback_summary.rows_by_semester %}
+                    {% for semester, rows in pending_feedback_summary.rows_by_semester.items() %}
+                    <div class="summary-title">Semester {{ semester }}</div>
+
+                    <div class="table-wrapper mb-4">
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Semester</th>
+                                        <th>Branch</th>
+                                        <th>Pending Subjects</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for row in rows %}
+                                    <tr>
+                                        <td>
+                                            <div class="student-name">{{ row.name }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="semester-badge">{{ row.semester }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="branch-badge">{{ row.branch }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="subject-box">{{ row.missing_subjects }}</div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3>No Pending Feedback</h3>
+                    <p>All students have successfully submitted their feedback.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-student" id="studentUploadModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Student Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="POST" action="/upload_students" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="file-drop-area" onclick="document.getElementById('studentFile').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h5>Click to select Excel file</h5>
+                        <p class="text-muted">Supported: .xlsx, .xls</p>
+                        <input type="file" name="file" id="studentFile" class="d-none" accept=".xlsx,.xls" required>
+                        <p id="studentFileName" class="text-muted mt-2"></p>
+                    </div>
+
+                    <div class="info-box">
+                        <h6>Excel Columns:</h6>
+                        <ul>
+                            <li><strong>Username, Password, Name, Email, Branch, Semester, Academic_Year,
+                                    Roll_Number</strong></li>
+                            <li>column order can be anything.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload Students</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-teacher" id="teacherUploadModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Teacher Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="POST" action="/upload_teachers" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="file-drop-area" onclick="document.getElementById('teacherFile').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h5>Click to select Excel file</h5>
+                        <p class="text-muted">Supported: .xlsx, .xls</p>
+                        <input type="file" name="file" id="teacherFile" class="d-none" accept=".xlsx,.xls" required>
+                        <p id="teacherFileName" class="text-muted mt-2"></p>
+                    </div>
+
+                    <div class="info-box">
+                        <h6>Excel Columns:</h6>
+                        <ul>
+                            <li><strong>Username, Password, Name, Email, Subject, Subject_Code, Branch,
+                                    Semester</strong></li>
+                            <li>column order can be anything..</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Upload Teachers</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="profileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Manage Profile
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('update_admin_profile') }}">
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Username
+                        </label>
+
+                        <input type="text"
+                               name="username"
+                               class="form-control"
+                               value="{{ current_user.username }}"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Email
+                        </label>
+
+                        <input type="email"
+                               name="email"
+                               class="form-control"
+                               value="{{ current_user.email }}"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            New Password
+                        </label>
+
+                        <input type="password"
+                               name="password"
+                               class="form-control"
+                               placeholder="Leave blank if not changing">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const studentInput = document.getElementById("studentFile");
+    const teacherInput = document.getElementById("teacherFile");
+
+    // helper function: find nearest h5 inside same modal
+    function updateLabel(input, defaultText) {
+        const file = input.files[0];
+
+        // go to parent .file-drop-area then find h5
+        const label = input.closest(".file-drop-area").querySelector("h5");
+
+        if (label) {
+            label.innerText = file ? file.name : defaultText;
+        }
+    }
+
+    if (studentInput) {
+        studentInput.addEventListener("change", function () {
+            updateLabel(this, "Click to select Excel file");
+        });
+    }
+
+    if (teacherInput) {
+        teacherInput.addEventListener("change", function () {
+            updateLabel(this, "Click to select Excel file");
+        });
+    }
+
+});
+</script>
+
+{% endblock %}

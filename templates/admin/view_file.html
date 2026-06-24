@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}View File{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">
+    <i class="fas fa-file-excel"></i> {{ file.filename }}
+</h2>
+
+<div class="mb-3">
+    <a href="{{ url_for('superadmin_dashboard', tab='view') }}" class="btn btn-secondary">
+        Back
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body d-flex flex-wrap gap-2 align-items-center">
+        <form method="POST" action="{{ url_for('view_file', file_id=file.id) }}">
+            <input type="hidden" name="action" value="add_row">
+            <button type="submit" class="btn btn-success">
+                Add Row
+            </button>
+        </form>
+
+        <form method="POST" action="{{ url_for('view_file', file_id=file.id) }}" class="d-flex gap-2">
+            <input type="hidden" name="action" value="add_col">
+            <input type="text" name="new_column_name" placeholder="New column name" class="form-control"
+                style="width: 240px;" required>
+            <button type="submit" class="btn btn-primary">
+                Add Column
+            </button>
+        </form>
+
+        <button type="submit" form="save_excel_form" class="btn btn-success">
+            Save Changes
+        </button>
+        {% if file.file_type == 'student' %}
+        <a href="{{ url_for('download_file_feedback', file_id=file.id) }}" class="btn btn-info">
+            Download Feedback Data Excel
+        </a>
+
+        <form method="POST" action="{{ url_for('view_file', file_id=file.id) }}"
+            class="d-flex flex-wrap gap-2 align-items-center">
+            <input type="hidden" name="action" value="promote_students">
+            <button type="submit" class="btn btn-warning"
+                onclick="return confirm('Are you sure? If you promote these students to next semester, feedback already submitted by students in this Excel will be hidden from current View Feedback and will move to Old View.')">
+                Promote
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('view_file', file_id=file.id) }}" id="save_excel_form">
+    <input type="hidden" name="action" value="save">
+    <input type="hidden" name="row_count" value="{{ df.shape[0] }}">
+
+    {% for col in df.columns %}
+    <input type="hidden" name="columns" value="{{ col }}">
+    {% endfor %}
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead>
+                <tr>
+                    <th style="min-width: 110px;">Rows</th>
+                    {% for col in df.columns %}
+                    <th style="min-width: 190px;">
+                        <div class="d-flex align-items-center justify-content-between gap-2">
+                            <span>{{ col }}</span>
+
+                            <button type="submit" form="delete_col_{{ loop.index0 }}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete column {{ col }}?')">
+                                Delete
+                            </button>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for i, row in df.iterrows() %}
+                <tr>
+                    <td>
+                        <button type="submit" form="delete_row_{{ i }}" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Delete this row?')">
+                            Delete Row
+                        </button>
+                    </td>
+
+                    {% for col in df.columns %}
+                    <td>
+
+                        {% if col|string|trim|lower == 'password' %}
+
+                        <input type="password" value="********" class="form-control" readonly>
+
+                        {% else %}
+
+                        <input type="text" name="cell_{{ i }}_{{ col }}" value="{{ row[col] }}" class="form-control">
+
+                        {% endif %}
+
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</form>
+
+{% for i, row in df.iterrows() %}
+<form method="POST" action="{{ url_for('view_file', file_id=file.id) }}" id="delete_row_{{ i }}">
+    <input type="hidden" name="action" value="delete_row">
+    <input type="hidden" name="row_index" value="{{ i }}">
+</form>
+{% endfor %}
+
+{% for col in df.columns %}
+<form method="POST" action="{{ url_for('view_file', file_id=file.id) }}" id="delete_col_{{ loop.index0 }}">
+    <input type="hidden" name="action" value="delete_col">
+    <input type="hidden" name="col_name" value="{{ col }}">
+</form>
+{% endfor %}
+{% endblock %}

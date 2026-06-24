@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="card mb-4 border-info">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h2><i class="fas fa-chalkboard-teacher"></i> Welcome, {{ current_user.username }}</h2>
+                <p class="text-muted mb-0">Current feedback follows each student's present semester in the student Excel.</p>
+            </div>
+            <div class="text-end">
+                <h1 class="text-info">{{ average_rating }}/5</h1>
+                <p class="text-muted mb-1">Average Rating</p>
+                <span class="badge bg-info text-dark">Overall: {{ average_rating_label }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Branch</label>
+                    <select name="branch" class="form-select">
+                        <option value="">All</option>
+                        {% for b in branches %}
+                        <option value="{{ b }}" {% if request.args.get('branch')==b %}selected{% endif %}>{{ b }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Semester</label>
+                    <select name="semester" class="form-select">
+                        <option value="">All Current Semesters</option>
+                        {% for sem in current_semesters %}
+                        <option value="{{ sem }}" {% if selected_semester == sem|string %}selected{% endif %}>{{ sem }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Subject</label>
+                    <select name="subject" class="form-select">
+                        <option value="">All Subjects</option>
+                        {% for sub in teacher_subjects %}
+                        <option value="{{ sub.subject }}" {% if sub.subject == selected_subject %}selected{% endif %}>
+                            {{ sub.subject }}{% if sub.subject_code %} ({{ sub.subject_code }}){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100"><i class="fas fa-filter"></i> Apply Filter</button>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <a class="btn btn-outline-secondary w-100" href="{{ url_for('teacher_old_feedbacks') }}">Old</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-2 col-sm-4 col-6"><div class="card text-center shadow-sm h-100"><div class="card-body"><h3>{{ total_feedbacks }}</h3><p class="mb-0">Total Feedbacks</p></div></div></div>
+    <div class="col-md-2 col-sm-4 col-6"><div class="card text-center shadow-sm h-100"><div class="card-body"><h3>{{ very_poor_count }}</h3><p class="mb-0">Very Poor</p></div></div></div>
+    <div class="col-md-2 col-sm-4 col-6"><div class="card text-center shadow-sm h-100"><div class="card-body"><h3>{{ poor_count }}</h3><p class="mb-0">Poor</p></div></div></div>
+    <div class="col-md-2 col-sm-4 col-6"><div class="card text-center shadow-sm h-100"><div class="card-body"><h3>{{ good_count }}</h3><p class="mb-0">Good</p></div></div></div>
+    <div class="col-md-2 col-sm-4 col-6"><div class="card text-center shadow-sm h-100"><div class="card-body"><h3>{{ very_good_count }}</h3><p class="mb-0">Very Good</p></div></div></div>
+    <div class="col-md-2 col-sm-4 col-6"><div class="card text-center shadow-sm h-100"><div class="card-body"><h3>{{ excellent_count }}</h3><p class="mb-0">Excellent</p></div></div></div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Current Student Feedbacks</h5>
+        <a class="text-white" href="{{ url_for('export_teacher_feedback', branch=request.args.get('branch'), semester=request.args.get('semester'), subject=request.args.get('subject')) }}">Export Excel</a>
+    </div>
+    <div class="card-body">
+        {% if feedbacks %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th><th>Roll No</th><th>Branch</th><th>Semester</th><th>Subject</th><th>Subject Code</th><th>Timestamp</th>
+                        <th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th><th>Q6</th><th>Q7</th><th>Q8</th><th>Q9</th><th>Q10</th><th>Q11</th><th>Q12</th><th>Total</th><th>Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in feedbacks %}
+                    <tr>
+                        <td>{{ f.student.name }}</td>
+                        <td>{{ f.student.roll_number }}</td>
+                        <td>{{ f.student.branch }}</td>
+                        <td>{{ f.semester }}</td>
+                        <td>{{ f.subject }}</td>
+                        <td>{{ f.subject_code }}</td>
+                        <td>{{ f.created_at.strftime('%d-%m-%Y %H:%M') }}</td>
+                        <td>{{ f.q1 }}</td><td>{{ f.q2 }}</td><td>{{ f.q3 }}</td><td>{{ f.q4 }}</td><td>{{ f.q5 }}</td><td>{{ f.q6 }}</td><td>{{ f.q7 }}</td><td>{{ f.q8 }}</td><td>{{ f.q9 }}</td><td>{{ f.q10 }}</td><td>{{ f.q11 }}</td><td>{{ f.q12 }}</td>
+                        <td><strong>{{ f.total }}</strong></td>
+                        <td>{{ (f.total / 12) | round(2) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-muted">No current feedback received yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

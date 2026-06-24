@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Feedback{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    body {
+        background: linear-gradient(to bottom right, #eef2ff, #f8fafc);
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .top-bar {
+        margin-bottom: 28px;
+    }
+
+    .top-bar .btn {
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-weight: 600;
+    }
+
+    .filter-card {
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 26px;
+        box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(255,255,255,0.6);
+        margin-bottom: 28px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .form-select {
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        padding: 12px 14px;
+        font-weight: 500;
+        transition: 0.2s ease;
+    }
+
+    .form-select:focus {
+        border-color: #0f766e;
+        box-shadow: 0 0 0 0.15rem rgba(15, 118, 110, 0.15);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border: none;
+        border-radius: 14px;
+        font-weight: 700;
+        padding: 12px 16px;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-secondary {
+        border-radius: 14px;
+        font-weight: 700;
+        padding: 12px 16px;
+    }
+
+    .data-card {
+        border-radius: 28px;
+        overflow: hidden;
+        background: white;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 12px 40px rgba(15, 23, 42, 0.10);
+    }
+
+    .data-header {
+        background: linear-gradient(135deg, #0f172a 0%, #0f766e 100%);
+        padding: 28px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .header-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.7rem;
+    }
+
+    .header-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .header-subtitle {
+        opacity: 0.8;
+        font-size: 0.95rem;
+    }
+
+    .data-count {
+        background: rgba(255,255,255,0.14);
+        padding: 12px 22px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .data-body {
+        padding: 30px;
+    }
+
+    .summary-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 32px 0 16px;
+        padding-left: 14px;
+        border-left: 5px solid #0f766e;
+    }
+
+    .table-wrapper {
+        overflow: hidden;
+        border-radius: 20px;
+        border: 1px solid #dbe4ee;
+        background: white;
+        box-shadow: 0 6px 20px rgba(15,23,42,0.05);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f8fafc !important;
+        color: #0f172a;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e2e8f0 !important;
+        padding: 16px !important;
+    }
+
+    .table tbody td {
+        padding: 18px 16px !important;
+        vertical-align: middle;
+        font-size: 0.96rem;
+        border-color: #edf2f7;
+    }
+
+    .table tbody tr {
+        transition: 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background: #f8fafc;
+        transform: scale(1.001);
+    }
+
+    .student-name {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .semester-badge {
+        background: #dbeafe;
+        color: #1d4ed8;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .branch-badge {
+        background: #ecfeff;
+        color: #0f766e;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .subject-box {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: #9a3412;
+        line-height: 1.7;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        padding: 90px 20px;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        width: 110px;
+        height: 110px;
+        margin: auto;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #16a34a;
+        margin-bottom: 24px;
+    }
+
+    .empty-state h3 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        font-size: 1rem;
+    }
+
+    @media(max-width:768px){
+
+        .data-header {
+            flex-direction: column;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .header-title {
+            font-size: 1.4rem;
+        }
+
+        .data-body {
+            padding: 18px;
+        }
+
+        .filter-card {
+            padding: 18px;
+        }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="top-bar d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+    <div class="page-title">
+        <i class="fas fa-user-clock me-2"></i>
+        Pending Feedback
+    </div>
+
+    <a href="{{ url_for('superadmin_dashboard', tab='average', branch=selected_branch, semester=selected_semester, subject_code=selected_subject_code, subject=selected_subject, teacher=selected_teacher) }}"
+       class="btn btn-outline-secondary">
+
+        <i class="fas fa-arrow-left me-2"></i>
+        Back to Dashboard
+
+    </a>
+
+</div>
+
+<div class="filter-card">
+
+    <form method="GET" action="{{ url_for('superadmin_pending_feedback') }}">
+
+        <input type="hidden" name="subject_code" value="{{ selected_subject_code }}">
+        <input type="hidden" name="subject" value="{{ selected_subject }}">
+        <input type="hidden" name="teacher" value="{{ selected_teacher }}">
+
+        <div class="row g-4 align-items-end">
+
+            <div class="col-md-5">
+
+                <label class="form-label">
+                    Branch
+                </label>
+
+                <select name="branch" class="form-select">
+
+                    <option value="">All Branches</option>
+
+                    {% for branch in branch_options %}
+
+                    <option value="{{ branch }}"
+                        {% if selected_branch == branch %}selected{% endif %}>
+
+                        {{ branch }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <label class="form-label">
+                    Semester
+                </label>
+
+                <select name="semester" class="form-select">
+
+                    <option value="">All Semesters</option>
+
+                    {% for semester in semester_options %}
+
+                    <option value="{{ semester }}"
+                        {% if selected_semester == semester|string %}selected{% endif %}>
+
+                        Semester {{ semester }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="col-md-3 d-flex gap-2">
+
+                <button type="submit"
+                        class="btn btn-primary flex-fill">
+
+                    <i class="fas fa-filter me-2"></i>
+                    Apply
+
+                </button>
+
+                <a href="{{ url_for('superadmin_pending_feedback') }}"
+                   class="btn btn-outline-secondary">
+
+                    Clear
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<div class="data-card">
+
+    <div class="data-header">
+
+        <div class="header-left">
+
+            <div class="header-icon">
+                <i class="fas fa-user-clock"></i>
+            </div>
+
+            <div>
+
+                <div class="header-title">
+                    Students Pending Feedback
+                </div>
+
+                <div class="header-subtitle">
+                    Students who have not submitted all required subject feedbacks
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="data-count">
+            {{ pending_feedback_summary.total_pending_students }} Students
+        </div>
+
+    </div>
+
+    <div class="data-body">
+
+        {% if pending_feedback_summary.rows_by_semester %}
+
+            {% for semester, rows in pending_feedback_summary.rows_by_semester.items() %}
+
+            <div class="summary-title">
+                Semester {{ semester }}
+            </div>
+
+            <div class="table-wrapper mb-4">
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Semester</th>
+                                <th>Branch</th>
+                                <th>Pending Subjects</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for row in rows %}
+
+                            <tr>
+
+                                <td>
+                                    <div class="student-name">
+                                        {{ row.name }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="semester-badge">
+                                        {{ row.semester }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="branch-badge">
+                                        {{ row.branch }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="subject-box">
+                                        {{ row.missing_subjects }}
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                <i class="fas fa-check"></i>
+            </div>
+
+            <h3>
+                No Pending Feedback
+            </h3>
+
+            <p>
+                All students have successfully submitted their feedback.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Old Feedbacks{% endblock %}
+
+{% block content %}
+<div class="card mb-4 border-secondary">
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h2 class="mb-1"><i class="fas fa-history"></i> Old Feedbacks</h2>
+            <p class="text-muted mb-0">Feedback from semesters that no longer match the student's present semester in the student Excel.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-primary" href="{{ url_for('teacher_dashboard') }}">Current View</a>
+            <a class="btn btn-success" href="{{ url_for('export_teacher_old_feedbacks') }}">Export Old Feedback</a>
+            <form method="POST" action="{{ url_for('delete_teacher_old_feedbacks') }}" onsubmit="return confirm('Are you sure to delete the old feedback data? ')">
+                <button type="submit" class="btn btn-danger">Delete Old</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Branch</label>
+                    <select name="branch" class="form-select">
+                        <option value="">All</option>
+                        {% for b in branches %}
+                        <option value="{{ b }}" {% if request.args.get('branch') == b %}selected{% endif %}>{{ b }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Semester</label>
+                    <select name="semester" class="form-select">
+                        <option value="">All Old Semesters</option>
+                        {% for sem in old_semesters %}
+                        <option value="{{ sem }}" {% if selected_semester == sem|string %}selected{% endif %}>{{ sem }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Subject</label>
+                    <select name="subject" class="form-select">
+                        <option value="">All Subjects</option>
+                        {% for sub in teacher_subjects %}
+                        <option value="{{ sub.subject }}" {% if sub.subject == selected_subject %}selected{% endif %}>
+                            {{ sub.subject }}{% if sub.subject_code %} ({{ sub.subject_code }}){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-primary w-100"><i class="fas fa-filter"></i> Apply Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Previous Semester Feedbacks</h5>
+    </div>
+    <div class="card-body">
+        {% if feedbacks %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Roll No</th>
+                        <th>Branch</th>
+                        <th>Semester</th>
+                        <th>Subject</th>
+                        <th>Subject Code</th>
+                        <th>Timestamp</th>
+                        <th>Total</th>
+                        <th>Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in feedbacks %}
+                    <tr>
+                        <td>{{ f.student.name }}</td>
+                        <td>{{ f.student.roll_number }}</td>
+                        <td>{{ f.student.branch }}</td>
+                        <td>{{ f.semester }}</td>
+                        <td>{{ f.subject }}</td>
+                        <td>{{ f.subject_code }}</td>
+                        <td>{{ f.created_at.strftime('%d-%m-%Y %H:%M') }}</td>
+                        <td><strong>{{ f.total }}</strong></td>
+                        <td>{{ (f.total / 12) | round(2) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-muted">No old feedback found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Teacher Feedback{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feedback-card {
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.feedback-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 18px 18px 0 0;
+    padding: 18px 25px;
+}
+
+/* TABLE STRUCTURE FIX */
+.feedback-table {
+    border: 2px solid #6c757d;
+    width: 100%;
+    table-layout: fixed; /* important for equal spacing */
+    border-collapse: collapse;
+}
+
+/* HEADERS */
+.feedback-table th {
+    background: #f1f3ff;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* CELLS */
+.feedback-table th,
+.feedback-table td {
+    border: 1.5px solid #6c757d !important;
+    padding: 12px;
+}
+
+/* QUESTION COLUMN */
+.feedback-table td:first-child,
+.feedback-table th:first-child {
+    width: 60%;
+    text-align: left;
+    font-weight: 500;
+}
+
+/* RATING COLUMNS */
+.feedback-table td:not(:first-child),
+.feedback-table th:not(:first-child) {
+    width: 8%;
+    text-align: center;
+}
+
+/* ROW HOVER */
+.feedback-table tr:hover {
+    background: #eef1ff;
+}
+
+/* RADIO STYLE */
+.rating-input {
+    cursor: pointer;
+    transform: scale(1.3);
+}
+
+.rating-input:checked {
+    accent-color: #667eea;
+}
+
+/* SUBMIT BUTTON */
+.submit-btn {
+    border-radius: 25px;
+    padding: 10px 35px;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+    <div class="card feedback-card">
+
+        <div class="feedback-header">
+            <h5 class="mb-0">
+                <i class="fas fa-star me-2"></i>
+                Teacher Feedback Form
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <!-- FORM START -->
+            <form method="POST" action="{{ url_for('submit_feedback', teacher_id=teacher.id) }}">
+                <input type="hidden" name="subject" value="{{ subject }}">
+
+                <div class="table-responsive">
+                    <table class="table text-center feedback-table">
+                        <thead>
+                            <tr>
+                                <th class="text-start">Description</th>
+                                {% for i in range(1,6) %}
+                                <th>{{ i }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {% set questions = [
+                            "Has the teacher covered entire syllabus as prescribed by University/College/Board?",
+                            "Has the teacher covered relevant topics beyond syllabus?",
+                            "Effectiveness of teacher in terms of technical/course content",
+                            "Effectiveness of teacherin terms of Communication skills",
+                            "Effectiveness of teacher in terms of Use of Teaching aids",
+                            "Pace on which contents were covered",
+                            "Motivation and inspiration for students to learn",
+                            "Support for the development of Students' Practical demonstration",
+                            "Support for the development of Students' Hands-on training",
+                            "Clarification of expectations of students",
+                            "Feedback provided on Students' progress",
+                            "Willingness to offer help and advice to students"
+                            ] %}
+
+                            {% for q in questions %}
+                            {% set question_index = loop.index %}
+                            <tr>
+                                <td class="text-start small fw-medium">
+                                    {{ question_index }}. {{ q }}
+                                </td>
+                                {% for i in range(1,6) %}
+                                <td>
+                                    <input class="form-check-input rating-input" type="radio"
+                                        name="q{{ question_index }}" value="{{ i }}" required>
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-success submit-btn shadow-sm">
+                        Submit Feedback
+                    </button>
+                </div>
+
+            </form>
+            <!-- FORM END -->
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
