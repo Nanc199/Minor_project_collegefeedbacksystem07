@@ -70,6 +70,7 @@ Minor_project_collegefeedbacksystem07/
 ```
 
 ## 🎥 Demo
+[▶️ Watch Demo](./demo.mp4)
 <img width="1920" height="1020" alt="Screenshot 2026-05-18 180937" src="https://github.com/user-attachments/assets/1e4e4f31-3567-4b8f-9c06-1c08a64537af" />
 <img width="1809" height="821" alt="Screenshot 2026-05-16 195639" src="https://github.com/user-attachments/assets/c1e97d52-45d6-4578-abdb-2926597ad230" />
 <img width="1920" height="914" alt="Screenshot 2026-05-16 195706" src="https://github.com/user-attachments/assets/4f6623ab-fc30-4de8-bc26-4dde7bde25ca" />
