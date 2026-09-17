@@ -71,11 +71,6 @@ Minor_project_collegefeedbacksystem07/
 
 ## 🎥 Demo
 
-<p align="center">
-  <a href="https://github.com/Nanc199/Minor_project_collegefeedbacksystem07/blob/main/Login%20-%20College%20Feedback%20System%20-%20Personal%20-%20Microsoft_%20Edge%202026-05-08%2010-51-48-compressed%20(1).mp4">
-    <img src="https://placehold.co/900x500/1f2937/ffffff?text=%E2%96%B6+WATCH+PROJECT+DEMO" alt="Watch Project Demo" width="900">
-  </a>
-</p>
 <img width="1920" height="1020" alt="Screenshot 2026-05-18 180937" src="https://github.com/user-attachments/assets/1e4e4f31-3567-4b8f-9c06-1c08a64537af" />
 <img width="1809" height="821" alt="Screenshot 2026-05-16 195639" src="https://github.com/user-attachments/assets/c1e97d52-45d6-4578-abdb-2926597ad230" />
 <img width="1920" height="914" alt="Screenshot 2026-05-16 195706" src="https://github.com/user-attachments/assets/4f6623ab-fc30-4de8-bc26-4dde7bde25ca" />
